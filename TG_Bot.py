@@ -1,14 +1,3 @@
-"""
-/start : create or update the table
-/anykey: say hello, and update the keyboard
-/location item: queryback the question about:
-
-    #1: save the location as target location (will pinned the location data on the chat room)
-    #2: search the stops and eta time
-    #3: point2point matching service (if the pinned message is available)
-"""
-
-from ast import parse
 from telegram.ext import (
     Updater,
     MessageHandler,
@@ -271,14 +260,8 @@ class TG_Clients:
         update.callback_query.message.delete()
         return ConversationHandler.END
 
-
-def echo(update: Update, context: CallbackContext) -> None:
-    """Echo the user message."""
-    user = MAIN_SYSTEM.login(update)
-    user.chatroom.send_message()
-
-
 def main():
+    API_KEY = "Your API"
     CONVERSATION = ConversationHandler(
         entry_points=[MessageHandler(Filters.location, TG_Clients.enter_conversation)],
         states={
@@ -296,7 +279,7 @@ def main():
 
 if __name__ == "__main__":
 
-    API_KEY = "2058616638:AAGOp7JqhzalJga69mP_7-vuOGvnJ9dOVZE"
+    
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -307,4 +290,3 @@ if __name__ == "__main__":
     DISPATCHER = UPDATER.dispatcher
     BOT = UPDATER.bot
     MAIN_SYSTEM = User_System()
-    main()
