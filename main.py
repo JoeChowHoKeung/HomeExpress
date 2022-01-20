@@ -296,10 +296,6 @@ def main():
 
 
 API_KEY = "2058616638:AAGOp7JqhzalJga69mP_7-vuOGvnJ9dOVZE"
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
 MASTER = Bus.Data(True)
 logger = logging.getLogger(__name__)
 UPDATER = Updater(API_KEY, workers=1)
