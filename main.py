@@ -302,7 +302,7 @@ logging.basicConfig(
 )
 MASTER = Bus.Data(True)
 logger = logging.getLogger(__name__)
-UPDATER = Updater(API_KEY, workers=4)
+UPDATER = Updater(API_KEY, workers=1)
 DISPATCHER = UPDATER.dispatcher
 BOT = UPDATER.bot
 MAIN_SYSTEM = User_System()
