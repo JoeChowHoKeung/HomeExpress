@@ -166,8 +166,9 @@ class Spider:
         while True:
             try:
                 connection = get(url)
+                raw = connection.json().get("data")
                 if (connection.status_code == 200) & bool(
-                    raw := connection.json().get("data")
+                    raw 
                 ):
                     if type(raw) is not list:
                         raw = [raw]
