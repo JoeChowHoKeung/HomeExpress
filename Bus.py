@@ -42,12 +42,12 @@ class Data:
     def point2point_match(
         self, location_current: tuple, location_target: tuple, eta: bool
     ) -> DataFrame:
-        result = self.stops_search(location_current, eta).merge(
+        result = self.stops_search(location_current).merge(
             self.stops_search(location_target),
             on=["co", "route", "dir", "service_type"],
             suffixes=["", "_target"],
         )
-
+        result = self._load_eta(result)
         keep_list = ["co", "route", "seq", "name", "seq_target", "name_target"]
         if eta:
             keep_list += ["dest", "1", "2", "3"]
@@ -143,7 +143,7 @@ class Spider:
     data: DataFrame
 
     def __init__(self, task: list, function: str) -> None:
-        self.executor = ThreadPoolExecutor(max_workers=min(10, len(task)))
+        self.executor = ThreadPoolExecutor(max_workers=min(15, len(task)))
         self.data = pd.DataFrame()
         self.task = task
         self.function = function
@@ -301,7 +301,7 @@ class Functions:
 
 
 if __name__ == "__main__":
-    debug = True
+    debug = False
     MASTER = Data(debug)
     if ~debug:
         MASTER.data.to_csv("bus_data.csv")
