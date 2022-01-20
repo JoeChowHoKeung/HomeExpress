@@ -294,17 +294,16 @@ def main():
     UPDATER.idle()
 
 
-if __name__ == "__main__":
 
-    API_KEY = "2058616638:AAGOp7JqhzalJga69mP_7-vuOGvnJ9dOVZE"
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    )
-    MASTER = Bus.Data(False)
-    logger = logging.getLogger(__name__)
-    UPDATER = Updater(API_KEY, workers=4)
-    DISPATCHER = UPDATER.dispatcher
-    BOT = UPDATER.bot
-    MAIN_SYSTEM = User_System()
-    main()
+API_KEY = "2058616638:AAGOp7JqhzalJga69mP_7-vuOGvnJ9dOVZE"
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+MASTER = Bus.Data(False)
+logger = logging.getLogger(__name__)
+UPDATER = Updater(API_KEY, workers=4)
+DISPATCHER = UPDATER.dispatcher
+BOT = UPDATER.bot
+MAIN_SYSTEM = User_System()
+main()
