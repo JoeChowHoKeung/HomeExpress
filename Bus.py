@@ -299,15 +299,3 @@ class Functions:
     ROUTE = "route"
     EFFECTIVE_DISTANCE = 0.007
     ETA_STOP = "eta_stop"
-
-
-if __name__ == "__main__":
-    debug = False
-    MASTER = Data(debug)
-    if ~debug:
-        MASTER.data.to_csv("bus_data.csv")
-    CURRENT = (22.3276524, 114.1660167)
-    TARGET = (22.2946943, 114.1688353)
-    result = MASTER.point2point_match(TARGET, CURRENT, True)
-    result = MASTER.stops_search(CURRENT, True)
-    print(result)
