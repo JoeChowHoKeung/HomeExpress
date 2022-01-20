@@ -300,7 +300,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
-MASTER = Bus.Data(False)
+MASTER = Bus.Data(True)
 logger = logging.getLogger(__name__)
 UPDATER = Updater(API_KEY, workers=4)
 DISPATCHER = UPDATER.dispatcher
