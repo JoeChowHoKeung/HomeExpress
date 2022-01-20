@@ -19,7 +19,6 @@ from telegram.ext import (
     CallbackQueryHandler,
 )
 from telegram import Update, Chat, replymarkup
-import logging
 from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
 from time import sleep
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
