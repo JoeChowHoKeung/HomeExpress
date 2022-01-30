@@ -12,17 +12,26 @@ from tqdm import tqdm
 
 
 class Data:
+    """Data is a data class of route information communicating others funciton"""
     data: DataFrame
     stop_list: DataFrame
 
     def __init__(self, debug: bool = False) -> None:
+        """the parameter of debug will decide the source of route data"""
         if debug:
-            self.data = self._load_data()
+            self.data = self._load_data()               # access the csv file "bus_data.csv" 
         else:
-            self.data = self._initial_master_data()
+            self.data = self._initial_master_data()     # start to scrap the NWFB, KMB, CTB bus data from Data.Gov.HK 
         pass
 
     def stops_search(self, location: tuple, eta: bool = False) -> DataFrame:
+        
+        """
+        input   : the user current location sourced from telegram bot
+        process : filter stops with specified effective distance regarding the location
+        output  : the Data class storing all the route-stops information which are within the effective distance
+        """
+
         result = self.data.copy()
         result["distance"] = result.location.apply(
             lambda row: self._calculate_distance(row, location)
@@ -35,19 +44,24 @@ class Data:
             subset=["co", "route", "dir", "service_type"], keep="first", inplace=True
         )
         result = result[condition]
-        if eta:
-            return self._load_eta(result)
+        if eta: return self._load_eta(result)
         return result.drop(["location", "distance", "stop"], axis=1)
 
     def point2point_match(
         self, location_current: tuple, location_target: tuple, eta: bool
     ) -> DataFrame:
-        result = self.stops_search(location_current).merge(
+        """
+        input   : the user current location and target location sourced from telegram bot
+        process : from two results of stops_search function, match the route number and direction with inner method
+        output  : the Data class stroring all the route-stops information which are available to reach target location from current location 
+        """
+
+        result = self.stops_search(location_current, eta).merge(
             self.stops_search(location_target),
             on=["co", "route", "dir", "service_type"],
             suffixes=["", "_target"],
         )
-        result = self._load_eta(result)
+
         keep_list = ["co", "route", "seq", "name", "seq_target", "name_target"]
         if eta:
             keep_list += ["dest", "1", "2", "3"]
@@ -59,6 +73,12 @@ class Data:
         pass
 
     def _load_eta(self, bus_data: DataFrame) -> DataFrame:
+        """
+        input  : the Data class storing all the route-stops information
+        process: From the Data.Gov.HK, scrap all the eta data regarding the route, then insert the eta_columns [{3 columns of eta}, destination]
+        output : the Data class storing all the route-stops informtion with the eta_columns
+        """
+
         eta_link = (
             bus_data[["co", "stop"]]
             .drop_duplicates(keep="first")
@@ -89,6 +109,14 @@ class Data:
         )
 
     def _initial_master_data(self) -> DataFrame:
+        """
+        process  :
+            1) generate the route, stops, and route-stops url links for webscrapping in Data.Gov.HK
+            2) data cleansing for storing as offline data
+            3) save the route-stop to offline file
+        
+        output  : the Data class which contains all the route-stop information provided by NWFB, CTB and KMB
+        """
         route = Spider(list(Company.route_url()), Functions.ROUTE).execute()
         route_stop_list = route.apply(
             lambda x: Company.generate_url(
@@ -132,6 +160,7 @@ class Data:
         return data
 
     def _calculate_distance(self, x, y) -> float:
+        """calculate the strict line distance of two points of locations """
         x = x.split(",")
         return sqrt(
             pow(float(y[0]) - float(x[0]), 2) + pow(float(y[1]) - float(x[1]), 2)
@@ -139,14 +168,15 @@ class Data:
 
 
 class Spider:
+    """this is a scrapping spider for scrapping the data from the Data.Gov.HK"""
     workers: ThreadPoolExecutor
     data: DataFrame
 
     def __init__(self, task: list, function: str) -> None:
-        self.executor = ThreadPoolExecutor(max_workers=min(15, len(task)))
-        self.data = pd.DataFrame()
-        self.task = task
-        self.function = function
+        self.executor = ThreadPoolExecutor(max_workers=min(10, len(task)))      # decide how many workers involve to the task
+        self.data = pd.DataFrame()                                              # final output
+        self.task = task                                                        
+        self.function = function                                                # the parameter of control flow decides which data cleansing action will be performed 
         pass
 
     def execute(self) -> None:
@@ -160,19 +190,20 @@ class Spider:
         return self.data
 
     def store_data(self, raw) -> None:
+        """receive the raw data and call the data cleansing action then insert the result to self.data"""
         self.data = self.data.append(self._refine_df(raw))
 
     def action(self, url) -> None:
+        """the main of spider is responsible for requesting url, and return the json data"""
         while True:
             try:
                 connection = get(url)
-                raw = connection.json().get("data")
                 if (connection.status_code == 200) & bool(
-                    raw 
+                    raw := connection.json().get("data")
                 ):
                     if type(raw) is not list:
                         raw = [raw]
-                    time.sleep(1)
+                    time.sleep(0.5)
                 break
             except ConnectionResetError:
                 time.sleep(5)
@@ -187,6 +218,7 @@ class Spider:
             self.store_data(pd.DataFrame(raw))
 
     def _refine_df(self, raw) -> DataFrame:
+        """control flow of data cleansing action"""
         if self.function == Functions.ROUTE:
             return self._refine_route(raw)
         elif self.function == Functions.STOP:
@@ -264,6 +296,7 @@ class Spider:
 
 
 class Company:
+    """it is a data class which is responsible for generating the url with parameters for the Spider"""
     KMB = "KMB"
     NWFB = "NWFB"
     CTB = "CTB"
@@ -299,3 +332,15 @@ class Functions:
     ROUTE = "route"
     EFFECTIVE_DISTANCE = 0.007
     ETA_STOP = "eta_stop"
+
+
+if __name__ == "__main__":
+    debug = True
+    MASTER = Data(debug)
+    if ~debug:
+        MASTER.data.to_csv("bus_data.csv")
+    CURRENT = (22.3276524, 114.1660167)
+    TARGET = (22.2946943, 114.1688353)
+    result = MASTER.point2point_match(TARGET, CURRENT, True)
+    result = MASTER.stops_search(CURRENT, True)
+    print(result)
