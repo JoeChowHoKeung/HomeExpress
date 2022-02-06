@@ -13,6 +13,7 @@ ___
 
 Through the pin message and sending location features of telegram, Home Express allows users to send location data for setting target point or current point to perform services. To store the location data as target location, user may click the first button “儲存為目的地”.
 > **EXAMPLE ?**
+> 
 > <img src="markdown_source/Save_Location.gif"/>
 
 ### Search Available Route
@@ -20,6 +21,7 @@ Through the pin message and sending location features of telegram, Home Express 
 After sending location data to Home Express, user may choose searching feature to obtain the stops information nearby the location data.
 
 > **EXAMPLE ?**
+> 
 > <img src="markdown_source/Search_Stops.gif"/>
 
 ### Point-to-Point Match
@@ -27,4 +29,5 @@ After sending location data to Home Express, user may choose searching feature t
 Given that the target location is saved as pinned message, user may send another location data for the point-to-point matching service.
 
 >   **EXAMPLE ?**
+>
 >   <img src="markdown_source/Point-to-Point.gif"/>
