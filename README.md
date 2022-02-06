@@ -1,6 +1,9 @@
 # **Home Express** *- self-developed telegram bot project*
 **Home Express** is the telegram bot providing ETA information of Hong Kong public transportation with point-to-point matching and searching available route services for users. The transportation data is resourced from ***Data.Gov.HK***, and location data of users is collected and saved in the telegram server. None of user data will be stored and analyze in local device of developer. For Enquires, please contact [joechow.hok@gmail.com](joechow.hok@gmail.com).
-
+___
+# **To Developers / Hiring Manager**
+The core operation file of telegram_bot is TG_Bot.py
+The BackEnd supporting is Bus.py 
 ___
 # *Operation*
 1. How to start **Home Express**
